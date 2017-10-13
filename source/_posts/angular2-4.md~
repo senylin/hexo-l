@@ -1,0 +1,187 @@
+---
+title: Angularjs2.x学习分解4(BUG篇)
+date: 2017-08-10 17:22:09
+tags:
+- javascript
+- angularjs
+---
+开发中遇到的angular2 BUG 在此统一过一篇
+<!--more-->
+### *ngFor *ngIf 不能在同一个元素下
+
+用`<ng-container></ng-container>`隔开
+
+### angular1 $watch in angularjs2
+
+用ngModelchange($event) / set||get / ngOnchanges() 三种代替
+
+### angularjs2 AOT编译器报错
+
+Angular 2.0.2 - Error encountered resolving symbol values statically
+
+https://stackoverflow.com/questions/39989083/angular-2-0-2-error-encountered-resolving-symbol-values-statically
+
+
+
+### angularjs2 闭包
+
+this问题
+
+需要写
+```
+var _this = this
+```
+
+### angular2 component重复declaration问题
+
+在上级module引用并exports这个共享的component
+```
+import { NgModule } from '@angular/core';
+import { SharedModule } from '../../../shared/shared.module';
+import { Routes,RouterModule } from '@angular/router';
+import { IndexRoutingModule } from './index-routing.module';
+import { IndexComponent } from './index.component';
+import { csptHeaderComponent } from '../../../components/cspt-dynamic/cspt-header/cspt-header.component';
+import { csptFooterComponent } from '../../../components/cspt-dynamic/cspt-footer/cspt-footer.component';
+import { csptNavComponent } from '../../../components/cspt-dynamic/cspt-nav/cspt-nav.component';
+import { csptTableComponent } from '../../../components/cspt-dynamic/cspt-table/cspt-table.component';
+import { csptPageNavComponent } from '../../../components/cspt-dynamic/cspt-page-nav/cspt-page-nav.component';
+import { csptSelectComponent } from '../../../components/cspt-dynamic/cspt-select/cspt-select.component';
+import { csptPaginatorComponent } from '../../../components/cspt-dynamic/cspt-paginator/cspt-paginator.component';
+import { HttpModule,Http } from '@angular/http';
+
+@NgModule({
+  declarations: [ 
+    IndexComponent,
+    csptHeaderComponent,
+    csptFooterComponent,
+    csptNavComponent,
+    csptTableComponent,
+    csptPageNavComponent,
+    csptSelectComponent,
+    csptPaginatorComponent
+  ],
+  imports: [
+    IndexRoutingModule,
+    SharedModule,
+  ],
+  exports:[
+    csptTableComponent,
+    csptPageNavComponent,
+    csptSelectComponent,
+    csptPaginatorComponent
+  ]
+})
+export class IndexModule { }
+
+```
+请注意 以上无效，最终我把所有component组件都放入share.module
+
+### angular2 Maximum call stack size exceeded
+
+这个问题发生在我index.module懒加载user.module时，use.module import了index.module  去掉即可
+https://stackoverflow.com/questions/42811049/angular-2-cli-error-in-maximum-call-stack-size-exceeded
+
+后续
+
+将共同的component放在shared.module中
+[routerLink]会报错（属于angular route）
+建议使用js的方法跳转相对路由  相对路由可以使页面不跳转
+参考链接 http://www.cnblogs.com/jiagoushi/p/6108039.html
+
+### No value accessor for form control with unspecified name attribute
+
+ @input 格式错误
+
+### angular2 简书博客问题记录
+ 
+ http://www.jianshu.com/p/a5402332315d
+ 
+ $compile转换
+ 
+ @HostListener
+ 
+ router
+ 
+ interceptor
+ 
+ form
+ 
+### angular2 extends super
+ 
+ 需要写成class的写法
+ 不能用 = function()
+ 
+ 
+### angular2 extands super this 回调与this作用域问题
+
+https://ashan.org/archives/655/
+
+将回调用的函数写成闭包可以将this作用域封闭
+
+### angular2 BUG record
+
+**单向数据绑定BUG**
+在系统分页中 ，通过单向数据绑定page.start 
+如HTML:[start]="mainTable.paginator.start"
+TS:this.mainTable.paginator.start = 1;
+当start属性被第二次通过this.mainTable.paginator.start赋值为1时失效，
+导致页码无法改变bug，暂时无法看出系统BUG，故归为单向绑定的bug记录。
+最终发现是内部改变导致单向数据绑定失效，改为双向数据绑定成功[(start)]="mainTable.paginator.start" 但仍有一定问题
+
+**论*ngIf影响viewChild（viewChild元素undefined）**
+
+在ngIf下的组件元素被viewchild调用时会在ngOninit之后被注册，
+因此ngOninit中调用该viewchild为undefined，需要在ngAfterinit中调用，或者放弃*ngIf改为[hidden]
+
+### angular2 component
+
+**viewChild组件初始化**
+实例描述
+```
+@ViewChild(csptReportComponent)
+  report:csptReportComponent; 
+  
+  
+    this.report.show =true;
+    this.report.report = o;
+    this.report.content = {
+      id:o.standardCourseId,
+      type:"standardCourses",
+      description:o.courseName,
+      fullname:_this.localStorage.getObject('config').session.iam.fullName,
+      source:"witwin"
+    };
+```
+  在父组件中引用该子组件,同时该子组件包含四个孙子组件
+`@ViewChild(csptReporttableComponent)
+  csptReporttable:csptReporttableComponent;
+  @ViewChild(csptReportformComponent)
+  csptReportform:csptReportformComponent;
+  @ViewChild(csptReportdealComponent)
+  csptReportdeal:csptReportdealComponent;
+  @ViewChild(csptReportdetailComponent)
+  csptReportdetail:csptReportdetailComponent;`
+  现在我要在父组件中动态显示隐藏csptReportComponent，在显示的时候希望能够初始化该组件包括所有的孙子组件，
+*part1*
+`this.report.constructor();`
+ngIf受到影响，无法第二次显示，this.report.show =true无效
+*part2*
+`this.report = new csptReportComponent(this.objectService,this.sessionLocalStorageService,this.csptProcessing,this.config,this.commonCtlService,this.reportService,this.localStorage);`
+在 this.report.report = o;报错
+`  set report(n){
+    this._report = n;
+    this.csptReporttable.report = n;
+    this.csptReportform.report = n;
+    this.csptReportdeal.report = n;
+    this.csptReportdetail.report = n;
+  }`报错，原因不明白，不选择
+  
+ *part3*
+` this.report.ngOnInit();`
+可用，相当于调用组件的方法，需要在组件中写上详细的初始化，目前选这个
+  
+  以上方法只能初始化组件中的数据，无法初始化组件中的html元素，未完待续
+ https://stackoverflow.com/questions/35105374/how-to-force-a-components-re-rendering-in-angular-2
+
+

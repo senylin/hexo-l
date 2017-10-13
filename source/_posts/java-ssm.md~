@@ -1,0 +1,37 @@
+---
+title: java-ssm框架学习
+date: 2016-11-09 19:39:19
+tags:
+- java
+- ssm
+
+---
+
+转载自[SSM框架——详细整合教程（Spring+SpringMVC+MyBatis）](http://blog.csdn.net/gebitan505/article/details/44455235)
+
+<!--more-->
+使用SSM（Spring、SpringMVC和Mybatis）已经有三个多月了，项目在技术上已经没有什么难点了，基于现有的技术就可以实现想要的功能，当然肯定有很多可以改进的地方。之前没有记录SSM整合的过程，这次刚刚好基于自己的一个小项目重新搭建了一次，而且比项目搭建的要更好一些。以前解决问题的过程和方法并没有及时记录，以后在自己的小项目中遇到我再整理分享一下。这次，先说说三大框架整合过程。个人认为使用框架并不是很难，关键要理解其思想，这对于我们提高编程水平很有帮助。不过，如果用都不会，谈思想就变成纸上谈兵了！！！先技术，再思想。实践出真知。（可通过图片水印查看博客地址）
+
+### Spring
+
+   Spring是一个开源框架，Spring是于2003 年兴起的一个轻量级的Java 开发框架，由Rod Johnson 在其著作Expert One-On-One J2EE Development and Design中阐述的部分理念和原型衍生而来。它是为了解决企业应用开发的复杂性而创建的。Spring使用基本的JavaBean来完成以前只可能由EJB完成的事情。然而，Spring的用途不仅限于服务器端的开发。从简单性、可测试性和松耦合的角度而言，任何Java应用都可以从Spring中受益。 简单来说，Spring是一个轻量级的控制反转（IoC）和面向切面（AOP）的容器框架。
+
+### SpringMVC
+
+    Spring MVC属于SpringFrameWork的后续产品，已经融合在Spring Web Flow里面。Spring MVC 分离了控制器、模型对象、分派器以及处理程序对象的角色，这种分离让它们更容易进行定制。
+
+### MyBatis
+
+    MyBatis 本是apache的一个开源项目iBatis, 2010年这个项目由apache software foundation 迁移到了google code，并且改名为MyBatis 。MyBatis是一个基于Java的持久层框架。iBATIS提供的持久层框架包括SQL Maps和Data Access Objects（DAO）MyBatis 消除了几乎所有的JDBC代码和参数的手工设置以及结果集的检索。MyBatis 使用简单的 XML或注解用于配置和原始映射，将接口和 Java 的POJOs（Plain Old Java Objects，普通的 Java对象）映射成数据库中的记录。
+
+### 开发环境搭建
+
+如果需要，参看之前的博文：http://blog.csdn.net/zhshulin/article/details/30779873
+
+### Maven Web项目创建
+
+如果需要，参看之前的博文：http://blog.csdn.net/zhshulin/article/details/37921705
+
+###其他的
+
+请看[SSM框架——详细整合教程（Spring+SpringMVC+MyBatis）](http://blog.csdn.net/gebitan505/article/details/44455235)
